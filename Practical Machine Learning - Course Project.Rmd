@@ -12,25 +12,50 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Introduction
 
 Research on human activity recognition has traditionally focused on discriminating between different types of activities, that is, to predict which activity was performed at a specific point in time. The quality of execution of an activity has received little attention so far, even though it potentially
-provides useful information for a large variety of applications. In this project we are going to use the Weight Lifting Exercises Dataset [1] to try and predict the quality of execution of a specific exercise using data from wearable accelerometers. To generate this dataset a group of 6 participants wearing accelerometers on the belt, forearm, arm and dumbbell were asked to perform unilateral dumbbell biceps curls correctly and incorrectly in five different ways. The objective of this project is therefore to develop a predictive model capable of identifying the specific way in which the participant is performing the exercise using the data provided by the wearable accelerometers.
+provides useful information for a large variety of applications. In this analysis we are going to use the Weight Lifting Exercises Dataset [1] to try and predict the quality of execution of a specific exercise using data from wearable accelerometers. To generate this dataset a group of 6 participants wearing accelerometers on the belt, forearm, arm and dumbbell were asked to perform unilateral dumbbell biceps curls correctly and incorrectly in five different ways. The objective of this project is therefore to develop a predictive model capable of identifying the specific way in which the participant was performing the exercise (the *classe* variable in the dataset) using the data provided by the wearable accelerometers.
 
+## Model Development
 
- 
+The Weight Lifting Excercises Dataset contains approximately 20,000 observations of 159 variables. These variables include the identification of the subject performing the exercise, a number of different timestamps and the readings from all the accelerometers at that specific point in time. For the observations in which the variable *new_window* has the value "yes" summary statistics like kurtosis, skewness, variance, standard deviation and average are also provided for each one of the accelerometer readings.
 
+The first step in our analysis will be to split the dataset into the *training* and *testing* datasets that will be used for cross validation using approximately 80% of the observations for training and the balance for testing the model.
 
-```{r cars}
-summary(cars)
+```{r, message=FALSE}
+library(caret)
+
+wleData = read.csv("pml-training.csv", row.names = 1)
+
+set.seed(27182)
+inTrain = createDataPartition(wleData$classe, p = 0.80, list = FALSE)
+
+training = wleData[inTrain,]
+testing = wleData[-inTrain,]
 ```
 
-## Including Plots
+As already mentioned above, for the observations in which the variable *new_window* has the value "yes", and only for these specific observations, a large number of summary statistics is also provided. Considering that this type of observations comprise only a very small percentage of the dataset (approximately 2%) and that the summary statistics provided with them are effectively redundant because the raw data is available in the dataset, we can significantly reduce the number of variables in the problem by simply removing those observations. Once those observations have been removed, the variables related to the summary statistics can be easily removed using the nearZeroVar() function from the caret package, which will also remove a couple of other variables with low information content.
 
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r, message=FALSE}
+training = subset(training, new_window == "no")
+nzv = nearZeroVar(training)
+training = training[,-nzv]
+testing = testing[,-nzv]
+dim(training)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+We were therefore able to reduce the number of variables in the problem from 159 to 58 by removing the small number of observations that contained redundant summary statistics. Now 
+
+
+
+
+
+
+
+
+
+```{r, message=FALSE}
+library(e1071)
+```
+
 
 ## References
 
