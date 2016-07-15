@@ -1,0 +1,38 @@
+---
+title: "Practical Machine Learning - Course Project"
+author: "Rodrigo Rezende"
+date: "July 15, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+Research on human activity recognition has traditionally focused on discriminating between different types of activities, that is, to predict which activity was performed at a specific point in time. The quality of execution of an activity has received little attention so far, even though it potentially
+provides useful information for a large variety of applications. In this project we are going to use the Weight Lifting Exercises Dataset [1] to try and predict the quality of execution of a specific exercise using data from wearable accelerometers. To generate this dataset a group of 6 participants wearing accelerometers on the belt, forearm, arm and dumbbell were asked to perform unilateral dumbbell biceps curls correctly and incorrectly in five different ways. The objective of this project is therefore to develop a predictive model capable of identifying the specific way in which the participant is performing the exercise using the data provided by the wearable accelerometers.
+
+
+ 
+
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+## References
+
+[1] Velloso, E.; Bulling, A.; Gellersen, H.; Ugulino, W.; Fuks, H. Qualitative Activity Recognition of Weight Lifting Exercises. Proceedings of 4th International Conference in Cooperation with SIGCHI (Augmented Human '13) . Stuttgart, Germany: ACM SIGCHI, 2013.
+
