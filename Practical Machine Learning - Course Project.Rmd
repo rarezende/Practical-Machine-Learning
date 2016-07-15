@@ -34,7 +34,7 @@ testing = wleData[-inTrain,]
 
 As already mentioned above, for the observations in which the variable *new_window* has the value "yes", and only for these specific observations, a large number of summary statistics is also provided. Considering that this type of observations comprise only a very small percentage of the dataset (approximately 2%) and that the summary statistics provided with them are effectively redundant because the raw data is available in the dataset, we can significantly reduce the number of variables in the problem by simply removing those observations. Once those observations have been removed, the variables related to the summary statistics can be easily removed using the nearZeroVar() function from the caret package, which will also remove a couple of other variables with low information content.
 
-```{r, message=FALSE}
+```{r}
 training = subset(training, new_window == "no")
 nzv = nearZeroVar(training)
 training = training[,-nzv]
@@ -42,19 +42,39 @@ testing = testing[,-nzv]
 dim(training)
 ```
 
-We were therefore able to reduce the number of variables in the problem from 159 to 58 by removing the small number of observations that contained redundant summary statistics. Now 
+We were therefore able to reduce the number of variables in the problem from 159 to 58 by removing the small number of observations that contained redundant summary statistics. Now, it is reasonable to assume that many of the remaining variables will be highly correlated since they all represent concurrent measurements of the same body movement. This type of problem can be very efficiently addressed using Principal Component Analysis and for that we can use the preProcess() function of the caret package.
 
+```{r}
+indClasse = ncol(wleData) - length(nzv)
 
+preProc = preProcess(training[,-indClasse], 
+                     method = c("pca","center","scale"), 
+                     thresh = 0.98)
 
+trainPC = predict(preProc, training[,-indClasse])
+dim(trainPC)
+```
 
-
-
-
-
+Using PCA we were able to further reduce the number of predictors to 35 retaining 98% of the variance of the original data. We can now efficiently fit a Support Vector Machine to classify the types of movement being performed.
 
 ```{r, message=FALSE}
 library(e1071)
+
+modelFit = svm(training$classe ~ ., data = trainPC)
 ```
+
+Once the model has been fitted we can then use our *testing* dataset to generate a confusion matrix and estimate the expected out of sample error.
+
+```{r}
+testPC = predict(preProc, testing[,-indClasse])
+
+confusionMatrix(testing$classe, predict(modelFit, testPC))
+```
+
+Given the classification results above we would expected an accuracy of around 95% for out of sample observations.
+
+It is important to note that a number of other classification models were tried, namely Random Forest, Linear Discriminant Analysis and Stochastic Gradient Boosting, but the Support Vector Machine was by far the fastest while still achieving very good accuracy results. For example, it took a couple of hours to train a Random Forest model to fit our training data while a Support Vector Machine was able to achieve similar levels of accuracy taking only 40 seconds to be trained. 
+
 
 
 ## References
